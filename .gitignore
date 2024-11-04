@@ -1,0 +1,809 @@
+Bisection
+
+from tabulate import tabulate
+import numpy as np
+import matplotlib.pyplot as plt
+
+def func(x):
+    return x**2 - 3
+
+def calculation(l, u, limit):
+    if l >= u or func(l) * func(u) >= 0:
+        print("No roots exist within the given interval")
+        return
+
+    count = 1
+    result_list = []
+    while count <= limit:
+        mid = (l + u) / 2
+        fl = func(l)
+        fu= func(u)
+        fm = func(mid)
+        result_list.append([l, u, mid, fl, fu, fm])
+        if func(mid) == 0:
+            return mid
+        elif func(l) * func(mid) < 0:
+            u = mid
+        else:
+            l = mid
+        count += 1
+
+    header = ["a", "b", "mid", "f(a)", "f(b)", "f(mid)"]
+    print(tabulate(result_list, headers=header, tablefmt="pretty"))
+
+    # Plotting the function
+    x_values = np.linspace(l - 1, u + 1, 100)
+    y_values = func(x_values)
+    
+    plt.plot(x_values, y_values, label='f(x) = x^2 - 3')
+    plt.axhline(0, color='black', linestyle='--', linewidth=0.8)
+    plt.axvline(result_list[-1][2], color='red', linestyle='--', label='Root')
+    
+    plt.scatter(result_list[-1][2], func(result_list[-1][2]), color='red')
+    
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('Bisection Method')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+lower_bound = float(input("Enter the lower bound: "))
+upper_bound = float(input("Enter the upper bound: "))
+num_iterations = int(input("Enter the number of iterations: "))
+calculation(lower_bound, upper_bound, num_iterations)
+
+
+Crammer rule
+
+
+import numpy as np
+
+n = int(input('Enter number of unknowns: '))
+A = np.zeros((n,n+1)) 
+
+print('Enter Matrix Coefficients:')
+for i in range(n):
+    for j in range(n+1):
+        A[i][j] = float(input( 'A['+str(i)+']['+ str(j)+']='))
+    
+def det2x2(A): 
+    return A[0][0]*A[1][1] - A[0][1]*A[1][0]
+
+def det3x3(A):
+    print('compute 3 x 3 det of')
+    print(A)
+    a,b,c = A[0]
+    c1 = a * det2x2(A[1:3,[1,2]])
+    c2 = b * det2x2(A[1:3,[0,2]])
+    c3 = c * det2x2(A[1:3,[0,1]])
+    return c1 - c2 + c3
+         
+print('solve this given array:')
+print(A, '\n')
+D = det3x3(A[:,[0,1,2]])
+print('D =', D, '\n')
+Dx = det3x3(A[:,[3,1,2]])
+print('Dx =', Dx, '\n')
+Dy = det3x3(A[:,[0,3,2]])
+print('Dy =', Dy, '\n')
+Dz = det3x3(A[:,[0,1,3]])
+print('Dz =', Dz, '\n')
+
+print("solution")
+print(f"x = {Dx*1.0/D:.5f}")
+print(f"y = {Dy*1.0/D:.5f}")
+print(f"z = {Dz*1.0/D:.5f}\n")
+
+
+euler rule
+
+import matplotlib.pyplot as plt
+
+# Define the functions
+f = lambda x: -(x**4)/2 + 4*x**3 - 10*x**2 + 8.5*x + 1
+dy = lambda x: -(2*x**3) + 12*x*x - 20*x + 8.5
+
+# Initial values
+x = 0
+xn = 4
+y = 1
+h = 0.5
+n = int((xn - x) / h)
+
+# Lists to store values for plotting
+x_values = [x]
+y_euler_values = [y]
+y_analytical_values = [f(x)]
+
+# Euler's method loop
+for i in range(n):
+    y += dy(x) * h
+    x += h
+    x_values.append(x)
+    y_euler_values.append(y)
+    y_analytical_values.append(f(x))
+
+# Print table
+print('x \t\ty(Euler) \ty(TRUE)')
+for i in range(len(x_values)):
+    print('%f \t%f \t%f' % (x_values[i], y_euler_values[i], y_analytical_values[i]))
+
+# Plot the results
+plt.plot(x_values, y_euler_values, label='Euler Solution ')
+plt.plot(x_values, y_analytical_values, label='TRUE Solution ')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+plt.show()
+
+
+false position
+
+from tabulate import tabulate
+import numpy as np
+import matplotlib.pyplot as plt
+
+def func(x):
+    return x**2 - 3
+
+def false_position(l, u, limit):
+    if l >= u or func(l) * func(u) >= 0:
+        print("No roots exist within the given interval")
+        return
+
+    count = 1
+    result_list = []
+    while count <= limit:
+        fl = func(l)
+        fu = func(u)
+
+        # False position formula
+        mid = u - (fu * (u - l)) / (fu - fl)
+
+        fm = func(mid)
+        result_list.append([l, u, mid, fl, fu, fm])
+
+        if fm == 0:
+            return mid
+        elif fl * fm < 0:
+            u = mid
+        else:
+            l = mid
+
+        count += 1
+
+    header = ["a", "b", "mid", "f(a)", "f(b)", "f(mid)"]
+    print(tabulate(result_list, headers=header, tablefmt="pretty"))
+
+    # Plotting the function
+    x_values = np.linspace(l - 1, u + 1, 100)
+    y_values = func(x_values)
+    
+    plt.plot(x_values, y_values, label='f(x) = x^2 - 3')
+    plt.axhline(0, color='black', linestyle='--', linewidth=0.8)
+    plt.axvline(result_list[-1][2], color='red', linestyle='--', label='Root')
+    
+    plt.scatter(result_list[-1][2], func(result_list[-1][2]), color='pink')
+    
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('False Position Method')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+lower_bound = float(input("Enter the lower bound: "))
+upper_bound = float(input("Enter the upper bound: "))
+num_iterations = int(input("Enter the number of iterations: "))
+false_position(lower_bound, upper_bound, num_iterations)
+
+
+gauss elimination
+
+# Importing NumPy Library
+import numpy as np
+import sys
+
+# Reading number of unknowns
+n = int(input('Enter number of unknowns: '))
+
+# Making numpy array of n x n+1 size and initializing
+# to zero for storing augmented matrix
+a = np.zeros((n, n + 1))
+
+x = np.zeros(n)
+
+# Reading augmented matrix coefficients
+print('Enter Augmented Matrix Coefficients:')
+for i in range(n):
+    for j in range(n + 1):
+        a[i][j] = float(input('a[' + str(i) + '][' + str(j) + ']='))
+
+# Applying Gauss Elimination
+for i in range(n):
+    if a[i][i] == 0.0:
+        sys.exit('Divide by zero detected!')
+
+    for j in range(i + 1, n):
+        ratio = a[j][i] / a[i][i]
+
+        for k in range(n + 1):
+            a[j][k] = a[j][k] - ratio * a[i][k]
+
+# Back Substitution
+x[n - 1] = a[n - 1][n] / a[n - 1][n - 1]
+
+for i in range(n - 2, -1, -1):
+    x[i] = a[i][n]
+
+    for j in range(i + 1, n):
+        x[i] = x[i] - a[i][j] * x[j]
+
+    x[i] = x[i] / a[i][i]
+
+# Displaying solution
+print('\nRequired solution is: ')
+for i in range(n):
+    print('X%d = %0.2f' % (i, x[i]), end='\t')
+
+
+gauss jordan
+
+import numpy as np
+import sys
+
+# Reading number of unknowns
+n = int(input('Enter number of unknowns: '))
+
+# Making numpy array of n x n+1 size and initializing
+# to zero for storing augmented matrix
+a = np.zeros((n, n + 1))
+
+# Making numpy array of n size and initializing
+# to zero for storing solution vector
+x = np.zeros(n)
+
+# Reading augmented matrix coefficients
+print('Enter Augmented Matrix Coefficients:')
+for i in range(n):
+    for j in range(n + 1):
+        a[i][j] = float(input('a[' + str(i) + '][' + str(j) + ']='))
+
+# Applying Gauss Jordan Elimination
+for i in range(n):
+    if a[i][i] == 0.0:
+        sys.exit('Divide by zero detected!')
+
+    for j in range(n):
+        if i != j:
+            ratio = a[j][i] / a[i][i]
+
+            for k in range(n + 1):
+                a[j][k] = a[j][k] - ratio * a[i][k]
+
+# Obtaining Solution
+
+for i in range(n):
+    x[i] = a[i][n] / a[i][i]
+
+# Displaying solution
+print('\nRequired solution is: ')
+for i in range(n):
+    print('X%d = %0.2f' % (i, x[i]), end='\t')
+
+
+linear regression
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# Take input for x and y
+n = int(input("Enter the number of data points: "))
+x_values = np.array([float(input(f"Enter x[{i+1}]: ")) for i in range(n)]).reshape(-1, 1)
+y_values = np.array([float(input(f"Enter y[{i+1}]: ")) for i in range(n)]).reshape(-1, 1)
+
+model = LinearRegression()
+model.fit(x_values, y_values)
+
+    # Extract coefficients
+a0 = model.intercept_[0]
+a1 = model.coef_[0][0]
+
+    # Print the coefficients for linear regression
+print(f'Intercept (a0): {a0:.4f}')
+print(f'Slope     (a1): {a1:.4f}')
+
+    # Plot the data points
+plt.scatter(x_values, y_values, color='blue', label='Data points')
+
+    # Plot the linear regression line
+regression_line = a0 + a1 * x_values
+plt.plot(x_values, regression_line, color='red', label=f'Linear Regression: y = {a0:.4f} + {a1:.4f}x')
+
+    # Add labels and legend
+plt.title('Linear Regression')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+
+    # Show the plot
+plt.show()
+
+
+
+polinomial
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+# Take input for x and y
+n = int(input("Enter the number of data points: "))
+x_values = np.array([float(input(f"Enter x[{i+1}]: ")) for i in range(n)]).reshape(-1, 1)
+y_values = np.array([float(input(f"Enter y[{i+1}]: ")) for i in range(n)]).reshape(-1, 1)
+
+# Transform the input features to include polynomial terms up to the specified degree
+poly_features = PolynomialFeatures(degree=2)
+x_poly = poly_features.fit_transform(x_values)
+
+# Perform polynomial regression
+poly_model = LinearRegression()
+poly_model.fit(x_poly, y_values)
+
+# Print the coefficients for polynomial regression
+print('Polynomial Regression Coefficients:')
+print(f'a{0}: {poly_model.intercept_[0]:.4f}')
+print(f'a{1}: {poly_model.coef_[0][1]:.4f}')
+print(f'a{2}: {poly_model.coef_[0][2]:.4f}')
+
+# Determine and print the intercept (a0)
+
+
+# Plot the data points
+plt.scatter(x_values, y_values, color='blue', label='Data points')
+
+# Plot the polynomial regression curve
+x_range = np.linspace(min(x_values), max(x_values), 100).reshape(-1, 1)
+x_range_poly = poly_features.transform(x_range)
+y_pred = poly_model.predict(x_range_poly)
+plt.plot(x_range, y_pred, color='red', label=f'Polynomial Regression (Degree {2})')
+
+# Add labels and legend
+plt.title('Polynomial Regression')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+
+# Show the plot
+plt.show()
+
+linear+polinomial
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+# Take input for x and y
+n = int(input("Enter the number of data points: "))
+x_values = np.array([float(input(f"Enter x[{i+1}]: ")) for i in range(n)]).reshape(-1, 1)
+y_values = np.array([float(input(f"Enter y[{i+1}]: ")) for i in range(n)]).reshape(-1, 1)
+
+# Take input for polynomial degree
+degree = int(input("Enter the degree of the polynomial: "))
+
+if degree == 1:
+    # Perform linear regression
+    model = LinearRegression()
+    model.fit(x_values, y_values)
+
+    # Extract coefficients
+    a0 = model.intercept_[0]
+    a1 = model.coef_[0][0]
+
+    # Print the coefficients for linear regression
+    print(f'Intercept (a0): {a0:.4f}')
+    print(f'Slope (a1): {a1:.4f}')
+
+    # Plot the data points
+    plt.scatter(x_values, y_values, color='blue', label='Data points')
+
+    # Plot the linear regression line
+    regression_line = a0 + a1 * x_values
+    plt.plot(x_values, regression_line, color='red', label=f'Linear Regression: y = {a0:.4f} + {a1:.4f}x')
+
+    # Add labels and legend
+    plt.title('Linear Regression')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+
+    # Show the plot
+    plt.show()
+
+else:
+    # Transform the input features to include polynomial terms up to the specified degree
+    poly_features = PolynomialFeatures(degree=degree)
+    x_poly = poly_features.fit_transform(x_values)
+
+    # Perform polynomial regression
+    poly_model = LinearRegression()
+    poly_model.fit(x_poly, y_values)
+
+    # Print the coefficients for polynomial regression
+    print('Polynomial Regression Coefficients:')
+    for i in range(degree + 1):
+        print(f'a{i}: {poly_model.coef_[0][i]:.4f}')
+
+    # Plot the data points
+    plt.scatter(x_values, y_values, color='blue', label='Data points')
+
+    # Plot the polynomial regression curve
+    x_range = np.linspace(min(x_values), max(x_values), 100).reshape(-1, 1)
+    x_range_poly = poly_features.transform(x_range)
+    y_pred = poly_model.predict(x_range_poly)
+    plt.plot(x_range, y_pred, color='red', label=f'Polynomial Regression (Degree {degree})')
+
+    # Add labels and legend
+    plt.title('Polynomial Regression')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+
+    # Show the plot
+    plt.show()
+
+
+ milnes 
+
+import numpy as np
+import matplotlib.pyplot as plt
+def milnes_predictor(x, y):
+    h = 0.5
+
+    y_pred = y[0] + 4*(h / 3) * (
+        2 * 0.5 * (x[1] + y[1]) -
+        1 * 0.5 * (x[2] + y[2]) +
+        2 * 0.5 * (x[3] + y[3])
+    )
+
+    print(f"At x = {x[4]}, y_predict_value = {y_pred:.5f}")
+
+    y_corr = y[2] + (h / 3) * (
+        1 * 0.5 * (x[2] + y[2]) +
+        4 * 0.5 * (x[3] + y[3]) +
+        1 * 0.5 * (x[4] + y_pred)
+    )
+    print(f"At x = {x[4]}, y_correct_value = {y_corr:.5f}")
+
+    # Plot the curve only for the corrector point
+    plt.plot(x[4], y_corr, label="Milne's Predictor-Corrector Curve (Corrector Point)", marker='o', color='blue')
+
+    # Connect the points from 0 to 0.5 to 1 to 1.5 and finally to the corrector point
+    plt.plot([x[0], x[1], x[2], x[3], x[4]], [y[0], y[1], y[2], y[3], y_corr], linestyle='--', color='blue', marker='o')
+
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    plt.title("Milne's Predictor-Corrector Method")
+    plt.show()
+
+x = np.array([0, 0.5, 1, 1.5, 2])
+y = np.array([2, 2.636, 3.595, 4.968, 0])  # Placeholder for y4
+
+milnes_predictor(x, y)  # function call
+
+
+newton rapson
+
+
+from tabulate import tabulate
+import numpy as np
+import matplotlib.pyplot as plt
+from sympy import symbols, diff
+
+def func(x):
+    return x**3 - 0.165*x**2 + 0.0003993
+
+def derivative(x):
+    # Calculate the derivative of the function
+    x_symbol = symbols('x')
+    f_prime = diff(func(x_symbol), x_symbol)
+    return f_prime.evalf(subs={x_symbol: x})
+
+def newton_raphson(initial_guess, num_iterations):
+    x_current = initial_guess
+    result_list = []
+
+    for iteration in range(1, num_iterations + 1):
+        f_x_current = func(x_current)
+        f_prime_x_current = derivative(x_current)
+
+        # Newton-Raphson formula
+        x_next = x_current - (f_x_current / f_prime_x_current)
+
+        result_list.append([x_current, f_x_current, f_prime_x_current, x_next])
+
+        if f_x_current == 0:
+            return x_current
+        x_current = x_next
+
+    header = ["x_current", "f(x_current)", "f'(x_current)", "x_next"]
+    print(tabulate(result_list, headers=header, tablefmt="pretty"))
+
+    # Plotting the function
+    x_values = np.linspace(initial_guess - 1, initial_guess + 1, 100)
+    y_values = func(x_values)
+    
+    plt.plot(x_values, y_values, label='f(x) = x^2 - 3')
+    plt.axhline(0, color='black', linestyle='--', linewidth=0.8)
+    plt.axvline(x_current, color='red', linestyle='--', label='Root (x_current)')
+    
+    plt.scatter(x_current, func(x_current), color='red')
+    
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('Newton-Raphson Method')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    return x_current
+
+initial_guess = float(input("Enter the initial guess: "))
+num_iterations = int(input("Enter the number of iterations: "))
+newton_raphson(initial_guess, num_iterations)
+
+
+
+picard Method
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import integrate
+def f(x, y):
+    return 1 + x * y
+def picards_method_integral(x0, y0, h, num_iterations):
+    x_values = [x0]
+    y_values = [y0]
+
+    for _ in range(num_iterations):
+        x = x_values[-1]  # -1 MEANS X0,Y0
+        y_integral = integrate.quad(lambda x: f(x, y_values[-1]), x_values[-1], x_values[-1] + h)[0]
+        y = y_values[-1] + y_integral # Y0+INTRGRAL PART SUTRO
+        x_values.append(x + h)
+        y_values.append(y)
+
+        print(f"At x = {x + h:.2f}, y = {y:.3f}")
+
+    return x_values, y_values
+
+# Initial conditions
+x0 = 0
+y0 = 1
+h = 0.1
+num_iterations = 5
+
+# Apply Picard's method with integral
+x_values_integral, y_values_integral = picards_method_integral(x0, y0, h, num_iterations)
+
+plt.scatter(x_values_integral, y_values_integral, color='red', label='Picard\'s Method Points (Integral)')
+
+# Connect the points with lines
+plt.plot(x_values_integral, y_values_integral, linestyle='--', color='red')
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title("Picard's Method with Integral Curve")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+secant methodd
+
+import matplotlib.pyplot as plt
+from tabulate import tabulate
+from math import e
+
+def secant(f, x1, x2,trueRoot, tolerance=1e-6, maxiter=100):
+    iteration_data = []
+
+    for iterations in range(1, maxiter + 1):
+        # Calculate the new approximation using the secant equation
+        # 
+        xnew = x2 - (x2 - x1) / (f(x2) - f(x1)) * f(x2)
+        
+        TrueError = (abs(trueRoot-xnew)/trueRoot)*100
+
+
+        # Store iteration data for later display
+        iteration_data.append([iterations, x1, x2, xnew, TrueError])
+
+        # Check for convergence
+        if abs(xnew - x2) < tolerance:
+            break
+
+        # Update values for the next iteration
+        x1 = x2
+        x2 = xnew
+
+    else:
+        # Raise an OverflowError if the maximum number of iterations is reached
+        raise OverflowError("Maximum number of iterations reached!")
+
+    return xnew, iterations, iteration_data
+
+# Get user input for the function and initial interval
+# f = lambda x: 2 * x**2 - 5 * x + 3
+f = lambda x: e**-x - x
+
+# Get user input for the initial interval
+x1, x2 = map(float, input("Enter the initial interval (x1 x2): ").split())
+trueRoot = float(input("Enter the true root: "))
+
+try:
+    # Find the root using the secant method
+    xnew, iterations, iteration_data = secant(f, x1, x2,trueRoot)
+except OverflowError as e:
+    # Handle the OverflowError and exit the program
+    print(e)
+    exit()
+
+# Display the results for each iteration
+iteration_header = ["Iteration", "x1", "x2", "xnew", "Et(True error)"]
+print(tabulate(iteration_data, headers=iteration_header, tablefmt="pretty"))
+
+# Display the final result
+print('\nThe Root: %0.5f' % xnew)
+print('The Number of Iterations: %d' % iterations)
+
+# Plotting the iteration process
+x_values = [data[2] for data in iteration_data] + [xnew]
+y_values = [data[4] for data in iteration_data] + [f(xnew)]
+
+plt.plot(x_values, y_values, marker='o', linestyle='-', color='b')
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.title('Secant Method Iteration Process')
+plt.grid(True)
+plt.show()
+
+simpsion 1by3
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import integrate
+
+f = lambda x: 0.2 + 25*x - 200*x**2 + 675*x**3 - 900*x**4 + 400*x**5
+a = 0
+b = 0.8
+c = (b - a) / 2
+
+x_vals = np.linspace(a, b, 100)
+y_vals = f(x_vals)
+
+I_approx = (b - a) * (1/6) * (f(a) + 4*f(c) + f(b))
+print("Approximated Integral using Simpson's 1/3 Rule, I_approx_simpson = %f" % I_approx)
+
+# Calculate the true integral using scipy
+I_true, _ = integrate.quad(f, a, b)
+print("True Integral, I_true = %f" % I_true)
+
+# Calculate absolute error
+error_simpson = ((I_true - I_approx) / I_true) * 100
+print("Relative Error using Simpson's 1/3 Rule = %f%%" % error_simpson)
+
+# Fit a quadratic function to the three points
+coefficients = np.polyfit([a, c, b], [f(a), f(c), f(b)], 2)
+quadratic_func = np.poly1d(coefficients)
+
+# Plotting the graph
+fig, ax = plt.subplots()
+
+# Plotting the error area in red
+ax.fill_between(x_vals, f(x_vals), alpha=0.4, color='red', label='Error Area')
+
+# Plotting the Simpson's 1/3 rule area in orange
+ax.fill_between(x_vals, np.where((x_vals >= a) & (x_vals <= b), quadratic_func(x_vals), np.nan), alpha=0.6, color='green', label="Simpson's 1/3 Rule Area")
+
+ax.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title("Simpson's 1/3 Rule for Numerical Integration with Error Visualization (Parabola Fit)")
+plt.show()
+
+
+simpson 3by8
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import integrate
+
+f = lambda x: 0.2 + 25*x - 200*x**2 + 675*x**3 - 900*x**4 + 400*x**5
+a = 0
+b = 0.8
+c = (b - a) / 3
+d = (b - a) / 3 * 2
+
+x_vals = np.linspace(a, b, 100)
+y_vals = f(x_vals)
+
+# Simpson's 3/8 rule
+I_approx = (b - a) * (1/8) * (f(a) + 3*f(c) + 3*f(d) + f(b))
+print("Approximated Integral using Simpson's 3/8 Rule, I_approx_simpson = %f" % I_approx)
+
+# Calculate the true integral using scipy
+I_true, _ = integrate.quad(f, a, b)
+print("True Integral, I_true = %f" % I_true)
+
+# Calculate absolute error
+error_simpson = ((I_true - I_approx) / I_true) * 100
+print("Relative Error using Simpson's 3/8 Rule = %f%%" % error_simpson)
+
+# Plotting the graph
+fig, ax = plt.subplots()
+
+# Plotting the error area in red
+ax.fill_between(x_vals, f(x_vals), alpha=1, color='red', label='Error Area')
+
+# Plotting the Simpson's 3/8 rule area with a cubic polynomial curve in green
+poly_coefficients = np.polyfit([a, c, d, b], [f(a), f(c), f(d), f(b)], 3)
+poly = np.poly1d(poly_coefficients)
+x_poly = np.linspace(a, b, 200)
+y_poly = poly(x_poly)
+
+ax.fill_between(x_poly, y_poly, alpha=1, color='green', label="Simpson's 3/8 Rule Area")
+
+ax.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Simpson\'s 3/8 Rule for Numerical Integration with Error Visualization')
+plt.show()
+
+
+trapizoidal
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import integrate
+
+f = lambda x: 0.2 + 25 * x - 200 * x ** 2 + 675 * x ** 3 - 900 * x ** 4 + 400 * x ** 5
+a = 0
+b = 0.8
+h = (b - a)
+
+x_vals = np.linspace(a, b, 100)
+y_vals = f(x_vals)
+
+# Simpson's 1/3 rule
+I_approx = h * 0.5 * (f(a) + f(b))
+print("Approximated Integral using Trapezoid Rule, I_approx_simpson = %f" % I_approx)
+
+# Calculate the true integral using scipy
+I_true, _ = integrate.quad(f, a, b)
+print("True Integral, I_true = %f" % I_true)
+
+# Calculate absolute error
+error_simpson = ((I_true - I_approx) / I_true) * 100
+print("Relative Error using Trapezoid Rule = %f%%" % error_simpson)
+
+# Plotting the graph
+fig, ax = plt.subplots()
+
+# Plotting the error area in red
+ax.fill_between(x_vals, f(x_vals), alpha=0.4, color='red', label='Error Area')
+
+# Plotting the Simpson's 1/3 rule area in orange
+ax.fill_between([a, b], [f(a), f(b)], alpha=0.6, color='green', label="Trapezoid Rule Area")
+
+ax.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Trapezoidal Rule for Numerical Integration with Error Visualization')
+plt.show()
